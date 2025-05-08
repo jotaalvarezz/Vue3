@@ -3,7 +3,7 @@
     <h1 class="title">CONTADOR</h1>
     <br />
     <div class="card" style="width: 18rem">
-      <div :class="num > 0 ? 'card-body positivo':'card-body negativo'">
+      <div :class="color">
         <h1 class="card-title text-dark text-center">{{ num }}</h1>
       </div>
     </div>
@@ -25,10 +25,11 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 
 const name = "Vue 3";
 const num = ref(0);
+
 
 const contador = () => {
   console.log(num);
@@ -42,6 +43,13 @@ const restador = () => {
 const resetear = () => {
   num.value = 0;
 };
+
+const color = computed(() => {
+  if(num.value < 0){
+    return "negativo"
+  }
+  return "positivo"
+})
 </script>
 <style scoped>
 .positivo{
