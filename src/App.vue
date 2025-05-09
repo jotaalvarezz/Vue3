@@ -11,29 +11,29 @@
     <div class="container">
       <div class="row">
         <div class="col-md-12">
-          <button class="btn btn-info" @click="contador">Incrementar</button>
+          <ButtonCounter text="Incrementar" :event="contador"/>
         </div>
         <div class="col-md-12 mt-2 mb-2">
-          <button class="btn btn-info" @click="restador">Decrementar</button>
+          <ButtonCounter text="Decrementar" :event="restador"/>
         </div>
         <div class="col-md-12 mb-2">
-          <button class="btn btn-info" @click="resetear">Resetear</button>
+          <ButtonCounter text="Resetear" :event="resetear"/>
         </div>
         <div class="col-md-12">
-          <button class="btn btn-info" :disabled="setDisable" @click="agregar()">Agregar</button>
+          <ButtonCounter text="Agregar" :disable="setDisable" :event="agregar"/>
         </div>
       </div>
     </div>
     <hr />
     <div class="container" v-if="list.length > 0">
-      <div
-        v-for="(item, index) in list"
-        @click="actualizar(item)"
-        :key="index"
-        class="alert alert-primary mt-4"
-        role="alert"
-      >
-        {{ item.label }} - {{ item }}
+      <div class="row">
+        <div class="col-md-6">
+          <ListItems :items="list" @itemFavorito="itemFavorito"/>
+        </div>
+        <div class="col-md-6">
+          <span class="text-center">Numero Favorito</span>
+          <h1 class="title">{{numeroFav}}</h1>
+        </div>
       </div>
     </div>
   </div>
@@ -41,9 +41,11 @@
 
 <script setup>
 import { ref, computed } from "vue";
+import ButtonCounter from "./components/ButtonCounter.vue";
+import ListItems from "./components/ListItems.vue";
 
-const name = "Vue 3";
 const num = ref(0);
+const numeroFav = ref(0);
 const list = ref([
   {
     id: 1,
@@ -84,11 +86,8 @@ const agregar = () => {
   list.value.push({ id:list.value.length, label: "numero", num: num.value });
 };
 
-const actualizar = (item) => {
-  const index = list.value.findIndex(objeto => objeto.id == item.id)
-  console.log(index)
-  item.num = 8888
-  list[index] = item
+const itemFavorito = (item) => {
+  numeroFav.value = item
 }
 
 const color = computed(() => {
