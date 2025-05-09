@@ -33,7 +33,7 @@
         class="alert alert-primary mt-4"
         role="alert"
       >
-        {{ item.label }} - {{ item.num }}
+        {{ item.label }} - {{ item }}
       </div>
     </div>
   </div>
