@@ -1,38 +1,17 @@
 <template>
   <div>
-    <h1 class="title">CONTADOR</h1>
-    <br />
-    <div class="card" style="width: 18rem">
-      <div :class="color">
-        <h1 class="card-title text-dark text-center">{{ num }}</h1>
-      </div>
-    </div>
-    <br />
-    <div class="container">
+    <Loading v-if="showLoading" />
+    <div class="container" v-else>
+      <span class="text-center">FAVORITO</span><br />
+      <Paginator @next="next" @previus="previus" />
       <div class="row">
         <div class="col-md-12">
-          <ButtonCounter text="Incrementar" :event="contador"/>
-        </div>
-        <div class="col-md-12 mt-2 mb-2">
-          <ButtonCounter text="Decrementar" :event="restador"/>
-        </div>
-        <div class="col-md-12 mb-2">
-          <ButtonCounter text="Resetear" :event="resetear"/>
-        </div>
-        <div class="col-md-12">
-          <ButtonCounter text="Agregar" :disable="setDisable" :event="agregar"/>
-        </div>
-      </div>
-    </div>
-    <hr />
-    <div class="container" v-if="list.length > 0">
-      <div class="row">
-        <div class="col-md-6">
-          <ListItems :items="list" @itemFavorito="itemFavorito"/>
-        </div>
-        <div class="col-md-6">
-          <span class="text-center">Numero Favorito</span>
-          <h1 class="title">{{numeroFav}}</h1>
+          <ListItems
+            :items="list.slice(inicio, fin)"
+            :start="inicio"
+            :end="fin"
+            @itemFavorito="itemFavorito"
+          />
         </div>
       </div>
     </div>
@@ -40,71 +19,72 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import ButtonCounter from "./components/ButtonCounter.vue";
+import { onMounted, ref } from "vue";
+
 import ListItems from "./components/ListItems.vue";
+import Paginator from "./components/Paginator.vue";
+import Loading from "./components/Loading.vue";
 
-const num = ref(0);
-const numeroFav = ref(0);
-const list = ref([
-  {
-    id: 1,
-    label: "uno",
-    num: 12,
-  },
-  {
-    id: 2,
-    label: "dos",
-    num: 26,
-  },
-  {
-    id: 3,
-    label: "tres",
-    num: 42,
-  },
-  {
-    id: 4,
-    label: "cuatro",
-    num: 19,
-  }
-]);
-
-const contador = () => {
-  console.log(num);
-  num.value++;
-};
-
-const restador = () => {
-  num.value--;
-};
-
-const resetear = () => {
-  num.value = 0;
-};
-
-const agregar = () => {
-  list.value.push({ id:list.value.length, label: "numero", num: num.value });
-};
+const numeroFav = ref("");
+const list = ref([]);
+const perpage = 10;
+const inicio = ref(0);
+const fin = ref(perpage);
+const showLoading = ref(true);
 
 const itemFavorito = (item) => {
-  numeroFav.value = item
-}
+  numeroFav.value = item;
+};
 
-const color = computed(() => {
-  if (num.value < 0) {
-    return "negativo";
+const next = () => {
+  if (fin.value < list.value.length) {
+    inicio.value = inicio.value + perpage;
+    fin.value = fin.value + perpage;
   }
-  return "positivo";
+};
+
+const previus = () => {
+  if (inicio.value > 0) {
+    inicio.value = inicio.value - perpage;
+    fin.value = fin.value - perpage;
+  }
+};
+
+onMounted(() => {
+  fetchData();
 });
 
-const setDisable = computed(() => {
-  const verifyNum = list.value.filter(item => item.num === num.value)
-  if(verifyNum.length > 0){
-    return true
+/* const fetchData = () => {
+  fetch("https://jsonplaceholder.typicode.com/posts")
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+      list.value = data;
+    })
+    .finally(() => {
+      setTimeout(() => {
+        showLoading.value = false;
+      }, 2000);
+    });
+}; */
+
+//con async y await
+
+const fetchData = async () => {
+  try {
+    const res = await fetch("https://jsonplaceholder.typicode.com/posts");
+    const data = await res.json();
+    list.value = data;
+  } catch (error) {
+    console.log("error", error);
+  } finally {
+    setTimeout(() => {
+      showLoading.value = false;
+    }, 2000);
   }
-  return false
-})
+};
 </script>
+
 <style scoped>
 .positivo {
   background-color: green;
